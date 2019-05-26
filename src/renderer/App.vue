@@ -7,8 +7,8 @@
       <a href="#" class="w3-bar-item w3-button" @click="selectFile()"><i class="material-icons md-18">folder_open</i><span>ファイルを開く(複数選択可能)<br>　　ファイルを直接ドロップ可能</span></a>
     </div>
 
-    <div style="margin-left:25%">
-      <Sheet v-for="(userList , index) in userListsTest" :key="index" :userList="userList"></Sheet>
+    <div class="contents">
+      <Sheet v-for="(userList , index) in userLists" :key="index" :userList="userList"></Sheet>
     </div>
   </div> 
 </template>
@@ -19,7 +19,7 @@
   import 'vue-full-screen-file-drop/dist/vue-full-screen-file-drop.css'
   const fs = require('fs')
   const { dialog } = require('electron').remote
-  const userData = require('./assets/userData.json')
+  // const userData = require('./assets/userData.json')
   export default {
     name: 'winshoko-barcode-printer',
     components: {
@@ -28,57 +28,49 @@
     },
     data () {
       return {
-        userData: [],
         userLists: []
       }
     },
     computed: {
-      userListsTest: function () {
-        [...Array(Math.floor(this.userData.length / 40))].forEach((_, i) => {
-          this.userLists.push([])
-        }, this)
-        this.userData.forEach((user, index) => {
-          this.userLists[Math.floor(index / 40)].push(user)
-        }, this)
-        return this.userLists
-      }
+
     },
     methods: {
       print: function () {
-        // window.print()
-        console.log(this.userData)
-        console.log(this.userLists)
+        window.print()
+        // console.log(this.userLists)
       },
       loadCsvFiles: function (filePaths) {
-        let self = this
-        self.userData = []
         if (filePaths.length === 0) return
+        let self = this
+        self.userLists = []
+        let i = 0
         filePaths.forEach(filePath => {
           fs.readFile(filePaths[0], {encoding: 'utf8'}, (err, data) => {
             if (!err) {
               let isSkipedHeader = false
-              console.log(data)
               data.split('\n').forEach(text => {
                 let csv = text.split(',')
-                if (csv[0] === 'id番号') isSkipedHeader = true
-                if (isSkipedHeader === false) return
-                console.log(csv[0])
-                self.userData.push({
+                if (csv[0] === 'id番号') {
+                  isSkipedHeader = true
+                  return
+                }
+                if (isSkipedHeader === false || !csv[0]) return
+                if (i % 39 === 0) { self.userLists.push([]) }
+                self.userLists[Math.floor(i / 40)].push({
                   id: csv[0],
                   studentNum: csv[1],
                   name: csv[2]
                 })
+                i++
               })
             }
           })
         })
-        console.log(userData)
       },
       onDrop (formData, files) {
         let filePaths = Object.values(files).map(file => file.path).filter(path => path.match(/csv$/))
-        console.log(this)
         this.loadCsvFiles(filePaths)
-        console.log(filePaths)
+        // console.log(filePaths)
       },
       selectFile () {
         let self = this
@@ -94,12 +86,12 @@
       }
     },
     created () {
-      [...Array(Math.floor(userData.length / 40))].forEach((_, i) => {
-        this.userLists.push([])
-      }, this)
-      userData.forEach((user, index) => {
-        this.userLists[Math.floor(index / 40)].push(user)
-      }, this)
+      // [...Array(Math.floor(userData.length / 40))].forEach((_, i) => {
+      //   this.userLists.push([])
+      // }, this)
+      // userData.forEach((user, index) => {
+      //   this.userLists[Math.floor(index / 40)].push(user)
+      // }, this)
     }
   }
 </script>
@@ -120,4 +112,25 @@
 .w3-sidebar .material-icons{
   vertical-align: middle;
 }
+.contents {
+  margin-left: 25%
+}
+@media screen {
+  body {
+    background: #eee;
+  }
+  .sheet {
+    background: white; /* 背景を白く */
+    box-shadow: 0 .5mm 2mm rgba(0,0,0,.3); /* ドロップシャドウ */
+    margin: 5mm;
+  }
+}
+@media print {
+  .w3-sidebar {
+    visibility: hidden;
+  }
+  .contents {
+    margin-left: 0%
+  }
+} 
 </style>

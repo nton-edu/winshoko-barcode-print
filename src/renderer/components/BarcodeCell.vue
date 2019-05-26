@@ -22,6 +22,7 @@
     .cell{
       width: 50mm;
       height: 29mm;
+      text-align: center
     }
     .cell p {
       margin-top: 0;
