@@ -1,5 +1,5 @@
 <template>
-    <section class="sheet">
+    <section class="sheet" v-if="!!userList.length">
         <BarcodeCell v-for="user in userList" :key="user.id" :user="user" />
     </section>
 </template>

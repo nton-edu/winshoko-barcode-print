@@ -1,8 +1,10 @@
 <template>
     <section class="cell">
-        <p>{{user.studentNum}}</p>
+      <div v-if="user.name !== ''">
+        <p>{{user.studentNum[0]+'年'+user.studentNum[1]+'組'+user.studentNum[2]+'番'}}</p>
         <p>{{user.name}}</p>
         <p class="barcode">a9{{user.id}}a</p>
+      </div>
     </section>
 </template>
 

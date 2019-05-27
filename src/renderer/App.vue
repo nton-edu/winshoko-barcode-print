@@ -20,7 +20,7 @@
   const fs = require('fs')
   const { dialog } = require('electron').remote
   const iconv = require('iconv-lite')
-  // const userData = require('./assets/userData.json')
+  const jschardet = require('jschardet')
   export default {
     name: 'winshoko-barcode-printer',
     components: {
@@ -38,33 +38,41 @@
     methods: {
       print: function () {
         window.print()
-        // console.log(this.userLists)
       },
       loadCsvFiles: function (filePaths) {
         if (filePaths.length === 0) return
         let self = this
         self.userLists = []
         let i = 0
+        let beforeStudentSheetNum = 0
         filePaths.forEach(filePath => {
-          fs.readFile(filePaths[0], {encoding: 'utf8'}, (err, data) => {
+          fs.readFile(filePath, (err, data) => {
             if (!err) {
               let isSkipedHeader = false
-              let buf = Buffer.from(data)
-              let retStr = iconv.decode(buf, 'Shift_JIS')
-              retStr.split('\n').forEach(text => {
+              let {encoding} = jschardet.detect(data)
+              iconv.decode(Buffer.from(data), encoding).split('\n').forEach(text => {
                 let csv = text.split(',')
                 if (csv[0] === '番号：') {
                   isSkipedHeader = true
                   return
                 }
+                // Win書庫で吐き出されるCSVは先頭行にフィールドがないためスキップする
                 if (isSkipedHeader === false || !csv[0]) return
-                if (i % 39 === 0) { self.userLists.push([]) }
-                self.userLists[Math.floor(i / 40)].push({
+                if (i % 39 === 0) self.userLists.push([])
+                // １クラス10人に合わせるために、空の配列を追加
+                let studentNum = csv[2].match(/(\d+)\D$/)[1]
+                if (studentNum === '1' && beforeStudentSheetNum !== 0) {
+                  [...Array(10 - beforeStudentSheetNum)].forEach(element => {
+                    self.userLists[Math.floor(i++ / 40)].push({id: csv[i], studentNum: [], name: ''})
+                    if (i % 39 === 0) self.userLists.push([])
+                  })
+                }
+                self.userLists[Math.floor(i++ / 40)].push({
                   id: csv[1],
-                  studentNum: csv[2],
+                  studentNum: csv[2].split(/\D+/g),
                   name: csv[3]
                 })
-                i++
+                beforeStudentSheetNum = studentNum
               })
             }
           })
@@ -73,7 +81,6 @@
       onDrop (formData, files) {
         let filePaths = Object.values(files).map(file => file.path).filter(path => path.match(/csv$/))
         this.loadCsvFiles(filePaths)
-        // console.log(filePaths)
       },
       selectFile () {
         let self = this
@@ -81,20 +88,11 @@
           title: 'Win書庫で出力したファイルを選択してください。複数選択することも可能です',
           defaultPath: '.',
           filters: [{name: 'text file', extensions: ['csv']}],
-          properties: ['openFile'],
-          multiSelections: true
+          properties: ['openFile', 'multiSelections']
         }, filePaths => {
           self.loadCsvFiles(filePaths)
         })
       }
-    },
-    created () {
-      // [...Array(Math.floor(userData.length / 40))].forEach((_, i) => {
-      //   this.userLists.push([])
-      // }, this)
-      // userData.forEach((user, index) => {
-      //   this.userLists[Math.floor(index / 40)].push(user)
-      // }, this)
     }
   }
 </script>
