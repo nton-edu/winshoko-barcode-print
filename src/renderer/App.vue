@@ -19,6 +19,7 @@
   import 'vue-full-screen-file-drop/dist/vue-full-screen-file-drop.css'
   const fs = require('fs')
   const { dialog } = require('electron').remote
+  const iconv = require('iconv-lite')
   // const userData = require('./assets/userData.json')
   export default {
     name: 'winshoko-barcode-printer',
@@ -48,18 +49,20 @@
           fs.readFile(filePaths[0], {encoding: 'utf8'}, (err, data) => {
             if (!err) {
               let isSkipedHeader = false
-              data.split('\n').forEach(text => {
+              let buf = Buffer.from(data, 'binary')
+              let retStr = iconv.decode(buf, 'Shift_JIS')
+              retStr.split('\n').forEach(text => {
                 let csv = text.split(',')
-                if (csv[0] === 'id番号') {
+                if (csv[0] === '番号：') {
                   isSkipedHeader = true
                   return
                 }
                 if (isSkipedHeader === false || !csv[0]) return
                 if (i % 39 === 0) { self.userLists.push([]) }
                 self.userLists[Math.floor(i / 40)].push({
-                  id: csv[0],
-                  studentNum: csv[1],
-                  name: csv[2]
+                  id: csv[1],
+                  studentNum: csv[2],
+                  name: csv[3]
                 })
                 i++
               })

@@ -26,4 +26,10 @@ install:
 build_script:
   - yarn build
 
+artifacts:
+  - path: build/*.zip
+    name: MyApp
+
+  - path: build/*/*.zip
+    name: _MyApp
 test: off
