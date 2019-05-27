@@ -49,7 +49,7 @@
           fs.readFile(filePaths[0], {encoding: 'utf8'}, (err, data) => {
             if (!err) {
               let isSkipedHeader = false
-              let buf = Buffer.from(data, 'binary')
+              let buf = Buffer.from(data)
               let retStr = iconv.decode(buf, 'Shift_JIS')
               retStr.split('\n').forEach(text => {
                 let csv = text.split(',')
