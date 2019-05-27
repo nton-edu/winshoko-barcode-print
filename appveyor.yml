@@ -27,9 +27,23 @@ build_script:
   - yarn build:win
 
 artifacts:
-  - path: build/*.exe
-    name: MyApp
 
-  - path: build/*/*.exe
-    name: _MyApp
+- path: build\*.exe
+
+  name: Release
+
+deploy:
+
+- provider: GitHub
+
+  description: とりあえずインストーラー
+
+  auth_token:
+
+    secure: /8ZAwZ368c84HyrY7Z/JslFfIFumdQGqLDe6DQqEzI2Po/MGj9vTuxE4EXccNwJw
+
+  artifact: Release
+
+  force_update: true
+
 test: off
