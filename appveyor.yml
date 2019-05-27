@@ -24,12 +24,12 @@ install:
   - node --version
 
 build_script:
-  - yarn build
+  - yarn build:win
 
 artifacts:
-  - path: build/*.zip
+  - path: build/*.exe
     name: MyApp
 
-  - path: build/*/*.zip
+  - path: build/*/*.exe
     name: _MyApp
 test: off
