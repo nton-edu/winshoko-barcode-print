@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Menu } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -26,6 +26,8 @@ function createWindow () {
   })
 
   mainWindow.loadURL(winURL)
+
+  installMenu()
 
   mainWindow.on('closed', () => {
     mainWindow = null
@@ -65,3 +67,29 @@ app.on('ready', () => {
   if (process.env.NODE_ENV === 'production') autoUpdater.checkForUpdates()
 })
  */
+
+function installMenu () {
+  menu = Menu.buildFromTemplate([
+    {
+      label: '&View',
+      submenu: [
+        {
+          label: '&Reload',
+          accelerator: 'Ctrl+R',
+          click: function () { mainWindow.restart() }
+        },
+        {
+          label: 'Toggle &Full Screen',
+          accelerator: 'F11',
+          click: function () { mainWindow.setFullScreen(!mainWindow.isFullScreen()) }
+        },
+        {
+          label: 'Toggle &Developer Tools',
+          accelerator: 'Alt+Ctrl+I',
+          click: function () { mainWindow.toggleDevTools() }
+        }
+      ]
+    }
+  ])
+  Menu.setApplicationMenu(menu)
+}
