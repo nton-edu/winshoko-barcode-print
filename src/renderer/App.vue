@@ -49,8 +49,9 @@
           fs.readFile(filePath, (err, data) => {
             if (!err) {
               let isSkipedHeader = false
-              let {encoding} = jschardet.detect(data)
-              iconv.decode(Buffer.from(data), encoding).split('\n').forEach(text => {
+              let {encoding} = jschardet.detect(Buffer.alloc(50, data))
+              iconv.decode(Buffer.from(data), encoding || 'SHIFT_JIS').split('\n').forEach(text => {
+                console.log(text)
                 let csv = text.split(',')
                 if (csv[0] === '番号：') {
                   isSkipedHeader = true
