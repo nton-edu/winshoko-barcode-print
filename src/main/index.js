@@ -69,7 +69,7 @@ app.on('ready', () => {
  */
 
 function installMenu () {
-  menu = Menu.buildFromTemplate([
+  let menu = Menu.buildFromTemplate([
     {
       label: '&View',
       submenu: [
