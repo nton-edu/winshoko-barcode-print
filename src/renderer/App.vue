@@ -61,7 +61,7 @@
                 if (i % 39 === 0) self.userLists.push([])
                 // １クラス10人に合わせるために、空の配列を追加
                 let studentNum = csv[2].match(/(\d+)\D$/)[1]
-                if (beforeStudentSheetNum !== 0 && (studentNum === '1' || studentNum === '01') {
+                if (beforeStudentSheetNum !== 0 && (studentNum === '1' || studentNum === '01')) {
                   [...Array(10 - beforeStudentSheetNum)].forEach(element => {
                     self.userLists[Math.floor(i++ / 40)].push({id: csv[i], studentNum: [], name: ''})
                     if (i % 39 === 0) self.userLists.push([])
