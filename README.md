@@ -1,6 +1,11 @@
 # winshoko-barcode-printer
+>win書庫で出力した利用者データをバーコードとともに印刷する  
+win書庫自体の表記があまり好きじゃなかったので、調整した  
+現状1クラス10人を想定して、A4に４クラス分（計40人)のデータを表示する  
+ソフトは[Release](https://github.com/nton-edu/winshoko-barcode-print/releases/latest)にあるインストーラからインストール可能  
+ソフトを起動した後、CSVファイルを放り込むとビューが表示される  
 
-> An electron-vue project
+
 
 #### Build Setup
 
